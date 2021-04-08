@@ -10,6 +10,8 @@ namespace context {
 pred declare i:term, i:list term, i:list-w-params factoryname, o:list prop, o:list constant.
 declare TheType TheParams GRFSwP MSL CL :-  std.do! [
   factories-provide GRFSwP MLwP,
+  if-verbose (coq.say "Here is the list of mixins to declare (the order matters): "
+    {list-w-params_list MLwP}),
   apply-w-params MLwP TheParams TheType MLwAllArgs,
   std.fold MLwAllArgs (pr [] []) (private.postulate-mixin TheType) (pr CL MSL),
   std.forall MSL (ms\ log.coq.env.accumulate current "hb.db" (clause _ _ ms)),
