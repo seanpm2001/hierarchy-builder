@@ -11,9 +11,7 @@ pred declare i:term, i:list term, i:list-w-params factoryname, o:list prop, o:li
 declare TheType TheParams GRFSwP MSL CL :-  std.do! [
   factories-provide GRFSwP MLwP,
   apply-w-params MLwP TheParams TheType MLwAllArgs,
-  std.fold MLwAllArgs [] private.postulate-mixin MSL,
-  MSL => instance.declare-all TheType {findall-classes} CSL,
-  std.map CSL snd CL,
+  std.fold MLwAllArgs (pr [] []) (private.postulate-mixin TheType) (pr CL MSL),
   std.forall MSL (ms\ log.coq.env.accumulate current "hb.db" (clause _ _ ms)),
 ].
 
@@ -27,15 +25,21 @@ namespace private {
 % a variable "mN" inhabiting M applied to T and
 % all its dependencies, previously postulated and associated
 % to the corresponding mixin using mixin-for
-pred postulate-mixin i:w-args mixinname, i:list prop, o:list prop.
-postulate-mixin (triple M Ps T) MSL [mixin-src T M (global (const C))|MSL] :- MSL => std.do! [
+pred postulate-mixin i:term, i:w-args mixinname, i:pair (list constant) (list prop),
+                     o:pair (list constant) (list prop).
+postulate-mixin TheType (triple M Ps T) (pr CL MSL) (pr OutCL OutMSL) :- MSL => std.do! [
   Name is "mixin_" ^ {gref->modname M},
 
   if-verbose (coq.say "HB: postulate" Name "on" {coq.term->string T}),
 
   synthesis.infer-all-mixin-args Ps T M Ty,
   std.assert-ok! (coq.typecheck Ty _) "postulate-mixin: Ty illtyped",
-  log.coq.env.add-section-variable-noimplicits Name Ty C
+  log.coq.env.add-section-variable-noimplicits Name Ty C,
+
+  OutMSL = [mixin-src T M (global (const C))|MSL],
+
+  OutMSL => instance.declare-all TheType {findall-classes} NewCSL,
+  std.append CL {std.map NewCSL snd} OutCL
 ].
 
 }}
