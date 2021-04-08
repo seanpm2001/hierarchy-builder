@@ -273,6 +273,9 @@ declare-mixin-or-factory Sort1 Fields GRFSwP Module TheType D TheParams :- std.d
     @global! => log.coq.arguments.set-implicit GRK [[]],
 
     factories-provide GRFSwP MLwP,
+
+    if-verbose (coq.say "HB: declare-mixin-or-factory MLwP =" MLwP),
+
     w-params.nparams MLwP NParams,
     build-deps-for-projections R MLwP GRDepsClausesProjs,
     GRDepsClauses = [gref-deps (indt R) MLwP, gref-deps (indc K) MLwP|GRDepsClausesProjs],
