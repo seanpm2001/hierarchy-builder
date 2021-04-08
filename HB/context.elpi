@@ -27,7 +27,7 @@ namespace private {
 % to the corresponding mixin using mixin-for
 pred postulate-mixin i:term, i:w-args mixinname, i:pair (list constant) (list prop),
                      o:pair (list constant) (list prop).
-postulate-mixin TheType (triple M Ps T) (pr CL MSL) (pr OutCL OutMSL) :- MSL => std.do! [
+postulate-mixin TheType (triple M Ps T) (pr CL MSL) (pr OutCL [MC|MSL]) :- MSL => std.do! [
   Name is "mixin_" ^ {gref->modname M},
 
   if-verbose (coq.say "HB: postulate" Name "on" {coq.term->string T}),
@@ -36,9 +36,8 @@ postulate-mixin TheType (triple M Ps T) (pr CL MSL) (pr OutCL OutMSL) :- MSL => 
   std.assert-ok! (coq.typecheck Ty _) "postulate-mixin: Ty illtyped",
   log.coq.env.add-section-variable-noimplicits Name Ty C,
 
-  OutMSL = [mixin-src T M (global (const C))|MSL],
-
-  OutMSL => instance.declare-all TheType {findall-classes} NewCSL,
+  MC = mixin-src T M (global (const C)),
+  MC => instance.declare-all TheType {findall-classes} NewCSL,
   std.append CL {std.map NewCSL snd} OutCL
 ].
 
