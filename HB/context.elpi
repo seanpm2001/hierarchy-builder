@@ -33,8 +33,15 @@ postulate-mixin TheType (triple M Ps T) (pr CL MSL) (pr OutCL [MC|MSL]) :- MSL =
   Name is "mixin_" ^ {gref->modname M},
 
   if-verbose (coq.say "HB: postulate" Name "on" {coq.term->string T}),
-
+  if-verbose (coq.say "HB: postulate-mixin infers all mixin args"
+    "Ps =" Ps ", T =" T ", M =" M ", Ty = " Ty),
+  if-verbose (
+    coq.say "---------------- HB: postulate-mixin prints constraints -------------",
+    print_constraints,
+    coq.say "------------------------------------------------------------"
+  ),
   synthesis.infer-all-mixin-args Ps T M Ty,
+  if-verbose (coq.say "HB: postulate-mixin checking" Ty),
   std.assert-ok! (coq.typecheck Ty _) "postulate-mixin: Ty illtyped",
   log.coq.env.add-section-variable-noimplicits Name Ty C,
 
