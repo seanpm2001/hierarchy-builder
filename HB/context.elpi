@@ -40,9 +40,10 @@ postulate-mixin TheType (triple M Ps T) (pr CL MSL) (pr OutCL [MC|MSL]) :- MSL =
     print_constraints,
     coq.say "------------------------------------------------------------"
   ),
-  synthesis.infer-all-mixin-args Ps T M Ty,
-  if-verbose (coq.say "HB: postulate-mixin checking" Ty),
-  std.assert-ok! (coq.typecheck Ty _) "postulate-mixin: Ty illtyped",
+  synthesis.infer-all-mixin-args Ps T M TySkel,
+  if-verbose (coq.say "HB: postulate-mixin checking" TySkel),
+  std.assert-ok! (coq.elaborate-ty-skeleton TySkel _ Ty)
+    "postulate-mixin: Ty illtyped",
   log.coq.env.add-section-variable-noimplicits Name Ty C,
 
   MC = mixin-src T M (global (const C)),
